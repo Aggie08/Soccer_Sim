@@ -486,7 +486,7 @@ func _try_pass(tick_data: Dictionary, is_gk_distribution: bool = false) -> bool:
 		pass_target = target
 		_change_state(AIState.PASSING)
 		
-		print("    ✅ Pass successful to ", target.player_data.player_name if target.has("player_data") else "teammate")
+		print("    ✅ Pass successful to ", target.player_data.player_name if target.player_data else "teammate")
 		
 		# Actually move the ball toward target
 		if ball:
