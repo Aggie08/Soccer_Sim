@@ -1,0 +1,262 @@
+[gd_scene load_steps=2 format=3 uid="uid://ccly8x3r4nmhq"]
+
+[ext_resource type="Script" uid="uid://duclchj1femwb" path="res://Scenes/UI/MatchHUD.gd" id="1_hud"]
+
+[node name="MatchHUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="TopBar" type="Panel" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 60.0
+grow_horizontal = 2
+
+[node name="ScoreLabel" type="Label" parent="TopBar"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 120.0
+offset_bottom = 45.0
+theme_override_font_sizes/font_size = 24
+text = "0 - 0"
+
+[node name="TimeLabel" type="Label" parent="TopBar"]
+layout_mode = 0
+offset_left = 140.0
+offset_top = 15.0
+offset_right = 240.0
+offset_bottom = 45.0
+theme_override_font_sizes/font_size = 24
+text = "00:00"
+
+[node name="CommandMeterBar" type="ProgressBar" parent="TopBar"]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 20.0
+offset_right = 460.0
+offset_bottom = 40.0
+value = 100.0
+show_percentage = false
+
+[node name="CommandMeterLabel" type="Label" parent="TopBar"]
+layout_mode = 0
+offset_left = 260.0
+offset_right = 390.0
+offset_bottom = 18.0
+theme_override_font_sizes/font_size = 12
+text = "Command Meter"
+
+[node name="PauseButton" type="Button" parent="TopBar"]
+layout_mode = 0
+offset_left = 1100.0
+offset_top = 10.0
+offset_right = 1180.0
+offset_bottom = 50.0
+text = "Pause"
+
+[node name="BackToMenuButton" type="Button" parent="TopBar"]
+layout_mode = 0
+offset_left = 1190.0
+offset_top = 10.0
+offset_right = 1270.0
+offset_bottom = 50.0
+text = "Menu"
+
+[node name="BottomBar" type="Panel" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -80.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="TacticsButton" type="Button" parent="BottomBar"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 150.0
+offset_bottom = 65.0
+text = "Tactics"
+
+[node name="FormationButton" type="Button" parent="BottomBar"]
+layout_mode = 0
+offset_left = 170.0
+offset_top = 15.0
+offset_right = 300.0
+offset_bottom = 65.0
+text = "Formation"
+
+[node name="SubstitutionButton" type="Button" parent="BottomBar"]
+layout_mode = 0
+offset_left = 320.0
+offset_top = 15.0
+offset_right = 450.0
+offset_bottom = 65.0
+text = "Substitutions"
+
+[node name="TacticsPanel" type="Panel" parent="."]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -200.0
+offset_right = 250.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="TacticsPanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 20
+text = "Tactics"
+
+[node name="AttackingLabel" type="Label" parent="TacticsPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 200.0
+offset_bottom = 80.0
+text = "Attacking Mentality"
+
+[node name="AttackingSlider" type="HSlider" parent="TacticsPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 85.0
+offset_right = 480.0
+offset_bottom = 105.0
+value = 50.0
+
+[node name="PressingLabel" type="Label" parent="TacticsPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 120.0
+offset_right = 200.0
+offset_bottom = 140.0
+text = "Pressing Intensity"
+
+[node name="PressingSlider" type="HSlider" parent="TacticsPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 145.0
+offset_right = 480.0
+offset_bottom = 165.0
+value = 50.0
+
+[node name="CloseButton" type="Button" parent="TacticsPanel"]
+layout_mode = 0
+offset_left = 380.0
+offset_top = 350.0
+offset_right = 480.0
+offset_bottom = 385.0
+text = "Close"
+
+[node name="FormationPanel" type="Panel" parent="."]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -250.0
+offset_right = 300.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="FormationPanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 20
+text = "Formation"
+
+[node name="FormationLabel" type="Label" parent="FormationPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 260.0
+offset_bottom = 85.0
+text = "Select Formation:"
+
+[node name="Formation442Button" type="Button" parent="FormationPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 90.0
+offset_right = 120.0
+offset_bottom = 125.0
+text = "4-4-2"
+
+[node name="Formation433Button" type="Button" parent="FormationPanel"]
+layout_mode = 0
+offset_left = 140.0
+offset_top = 90.0
+offset_right = 240.0
+offset_bottom = 125.0
+text = "4-3-3"
+
+[node name="Formation352Button" type="Button" parent="FormationPanel"]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 90.0
+offset_right = 360.0
+offset_bottom = 125.0
+text = "3-5-2"
+
+[node name="CloseButton" type="Button" parent="FormationPanel"]
+layout_mode = 0
+offset_left = 480.0
+offset_top = 450.0
+offset_right = 580.0
+offset_bottom = 485.0
+text = "Close"
+
+[node name="SubstitutionPanel" type="Panel" parent="."]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -250.0
+offset_right = 300.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="SubstitutionPanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 20
+text = "Substitutions"
+
+[node name="InfoLabel" type="Label" parent="SubstitutionPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 560.0
+offset_bottom = 110.0
+text = "Substitution system will be implemented here.
+Select a player on the bench and a player on the field to swap."
+
+[node name="CloseButton" type="Button" parent="SubstitutionPanel"]
+layout_mode = 0
+offset_left = 480.0
+offset_top = 450.0
+offset_right = 580.0
+offset_bottom = 485.0
+text = "Close"

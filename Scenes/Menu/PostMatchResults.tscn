@@ -1,0 +1,100 @@
+[gd_scene load_steps=2 format=3 uid="uid://m4ue56f4q588"]
+
+[ext_resource type="Script" uid="uid://o0lsoqf10qto" path="res://Scenes/Menu/PostMatchResults.gd" id="1_results"]
+
+[node name="PostMatchResults" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_results")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.1, 1)
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -300.0
+offset_right = 400.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="TitleLabel" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "FULL TIME"
+horizontal_alignment = 1
+
+[node name="ScorePanel" type="VBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="HomeTeamLabel" type="Label" parent="PanelContainer/VBoxContainer/ScorePanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Home Team"
+horizontal_alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="PanelContainer/VBoxContainer/ScorePanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "0  -  0"
+horizontal_alignment = 1
+
+[node name="AwayTeamLabel" type="Label" parent="PanelContainer/VBoxContainer/ScorePanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Away Team"
+horizontal_alignment = 1
+
+[node name="ResultLabel" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "RESULT"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="ButtonPanel" type="VBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="RematchButton" type="Button" parent="PanelContainer/VBoxContainer/ButtonPanel"]
+custom_minimum_size = Vector2(400, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "⚽ Rematch (Swap Sides)"
+
+[node name="NewMatchButton" type="Button" parent="PanelContainer/VBoxContainer/ButtonPanel"]
+custom_minimum_size = Vector2(400, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "🔄 New Match"
+
+[node name="MainMenuButton" type="Button" parent="PanelContainer/VBoxContainer/ButtonPanel"]
+custom_minimum_size = Vector2(400, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "🏠 Main Menu"
