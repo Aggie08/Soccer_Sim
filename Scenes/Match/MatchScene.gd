@@ -51,12 +51,6 @@ func _ready() -> void:
 
 ## Connect signals from managers and HUD
 func _connect_signals() -> void:
-	# OLD: MatchManager signals (replaced by MatchEngine)
-	# MatchManager.match_started.connect(_on_match_started)
-	# MatchManager.goal_scored.connect(_on_goal_scored)
-	# MatchManager.match_ended.connect(_on_match_ended)
-	# MatchManager.match_tick.connect(_on_match_tick)
-	
 	# Note: MatchEngine signals are connected in _create_match_engine()
 	
 	# Connect HUD buttons
@@ -174,7 +168,7 @@ func _spawn_team_players(team: Team, is_home: bool) -> void:
 func _position_players_for_kickoff() -> void:
 	print("Positioning players for kickoff...")
 	
-	# Home team (bottom)
+	# Home team (left side)
 	for token in home_players:
 		var position_name = token.get_position_on_field()
 		var pitch_pos = pitch.get_formation_position(position_name, true)
@@ -182,7 +176,7 @@ func _position_players_for_kickoff() -> void:
 		token.set_target_position(pitch_pos)
 		print("  Home: ", token.player_data.player_name, " at ", pitch_pos)
 	
-	# Away team (top)
+	# Away team (right side)
 	for token in away_players:
 		var position_name = token.get_position_on_field()
 		var pitch_pos = pitch.get_formation_position(position_name, false)
@@ -239,7 +233,6 @@ func _initialize_ball() -> void:
 ## Execute kickoff - striker passes to teammate
 func _execute_kickoff() -> void:
 	# Determine which team kicks off (home for first half)
-	# In future: away team kicks off for second half
 	var kicking_team = home_players
 	var kicking_team_is_home = true
 	
@@ -272,7 +265,7 @@ func _execute_kickoff() -> void:
 		return
 	
 	# Give ball to striker and update match engine
-	_give_ball_to_player(striker)  # This calls match_engine.set_possession and prints message
+	_give_ball_to_player(striker)
 	
 	# Find a nearby teammate to pass to
 	var pass_target: Node2D = null
@@ -342,10 +335,10 @@ func _process(delta: float) -> void:
 
 ## Update HUD elements
 func _update_hud() -> void:
-	if hud:
-		hud.set_score(MatchManager.home_score, MatchManager.away_score)
-		hud.set_time(MatchManager.get_match_time_string())
-		hud.set_command_meter(MatchManager.command_meter)
+	if not hud or not match_engine:
+		return
+	# Score and time are updated via _on_engine_tick, but keep command meter here
+	hud.set_command_meter(MatchManager.command_meter)
 
 ## Update ball possession logic
 func _update_ball_possession() -> void:
@@ -361,11 +354,11 @@ func _check_for_ball_pickup() -> void:
 	const PICKUP_DISTANCE = 30.0
 	var ball_pos = ball.global_position
 	
-	var all_players = home_players + away_players
+	var all_field_players = home_players + away_players
 	var closest_player: Node2D = null
 	var closest_distance = PICKUP_DISTANCE
 	
-	for player in all_players:
+	for player in all_field_players:
 		if not is_instance_valid(player):
 			continue
 		
@@ -408,28 +401,27 @@ func _on_engine_goal_scored(team: String, scorer_idx: int, minute: int, xg: floa
 		if token and token.player_data:
 			scorer_name = token.player_data.player_name
 	
-	print("⚽ GOAL! ", scorer_name, " scores for ", scoring_team.team_name, " (", minute, "', xG: ", "%.2f" % xg, ")")
+	print("GOAL! ", scorer_name, " scores for ", scoring_team.team_name, " (", minute, "', xG: ", "%.2f" % xg, ")")
 	
 	# Reset positions for kickoff
 	await get_tree().create_timer(2.0).timeout
 	_position_players_for_kickoff()
 
 func _on_engine_half_time() -> void:
-	print("⏸ Half-time! Score: ", match_engine.home_score, " - ", match_engine.away_score)
-	# HUD could show half-time screen here
+	print("Half-time! Score: ", match_engine.home_score, " - ", match_engine.away_score)
 
 func _on_engine_full_time() -> void:
 	match_started = false
-	var home_score = match_engine.home_score
-	var away_score = match_engine.away_score
+	var final_home_score = match_engine.home_score
+	var final_away_score = match_engine.away_score
 	
-	print("⏱ Full time! Final score: ", home_team.team_name, " ", home_score, " - ", away_score, " ", away_team.team_name)
+	print("Full time! Final score: ", home_team.team_name, " ", final_home_score, " - ", final_away_score, " ", away_team.team_name)
 	
 	# Store match results for post-match screen
 	get_tree().root.set_meta("match_home_team", home_team)
 	get_tree().root.set_meta("match_away_team", away_team)
-	get_tree().root.set_meta("match_home_score", home_score)
-	get_tree().root.set_meta("match_away_score", away_score)
+	get_tree().root.set_meta("match_home_score", final_home_score)
+	get_tree().root.set_meta("match_away_score", final_away_score)
 	
 	# Transition to results screen after a brief delay
 	await get_tree().create_timer(2.0).timeout
@@ -446,42 +438,10 @@ func _on_engine_tick(tick_data: Dictionary) -> void:
 		match_engine.update_ball_position(ball.global_position)
 		match_engine.update_ball_velocity(ball.velocity)
 	
-	# Update HUD score every tick
+	# Update HUD score and time every tick
 	if hud:
 		hud.update_score(match_engine.home_score, match_engine.away_score)
 		hud.update_time(int(match_engine.match_minute), match_engine.current_half)
-
-# ============================================================================
-# LEGACY MATCH MANAGER CALLBACKS (for compatibility)
-# ============================================================================
-
-func _on_match_started() -> void:
-	match_started = true
-	print("Match started!")
-
-func _on_goal_scored(team_side: String, scorer: Player) -> void:
-	print("GOAL! ", scorer.player_name, " scores for ", team_side)
-	
-	# Reset positions for kickoff
-	_position_players_for_kickoff()
-
-func _on_match_ended(home_score: int, away_score: int) -> void:
-	match_started = false
-	print("Match ended! Final score: ", home_score, " - ", away_score)
-	
-	# Store match results for post-match screen
-	get_tree().root.set_meta("match_home_team", home_team)
-	get_tree().root.set_meta("match_away_team", away_team)
-	get_tree().root.set_meta("match_home_score", home_score)
-	get_tree().root.set_meta("match_away_score", away_score)
-	
-	# Transition to results screen after a brief delay
-	await get_tree().create_timer(2.0).timeout
-	get_tree().change_scene_to_file("res://Scenes/Menu/PostMatchResults.tscn")
-
-func _on_match_tick(tick_count: int) -> void:
-	# This is where AI decisions will happen
-	pass
 
 # ============================================================================
 # HUD BUTTON CALLBACKS
@@ -489,25 +449,33 @@ func _on_match_tick(tick_count: int) -> void:
 
 func _on_tactics_pressed() -> void:
 	print("Tactics panel opened")
-	# Pause the match while tactics are being changed
-	get_tree().paused = true
+	# Pause the match engine only — UI stays interactive
+	if match_engine:
+		match_engine.pause_match()
 
 func _on_formation_pressed() -> void:
 	print("Formation panel opened")
-	get_tree().paused = true
+	if match_engine:
+		match_engine.pause_match()
 
 func _on_substitution_pressed() -> void:
 	print("Substitution panel opened")
-	get_tree().paused = true
+	if match_engine:
+		match_engine.pause_match()
 
 func _on_pause_pressed() -> void:
-	get_tree().paused = not get_tree().paused
-	print("Match paused: ", get_tree().paused)
+	if match_engine:
+		if match_engine.is_paused:
+			match_engine.resume_match()
+			print("Match resumed")
+		else:
+			match_engine.pause_match()
+			print("Match paused")
 
 func _on_back_to_menu_pressed() -> void:
-	# Unpause before leaving
-	get_tree().paused = false
-	# Return to main menu
+	# Resume engine before leaving so nothing is stuck
+	if match_engine and match_engine.is_paused:
+		match_engine.resume_match()
 	get_tree().change_scene_to_file("res://Scenes/Menu/MainMenu.tscn")
 
 # ============================================================================
@@ -515,28 +483,20 @@ func _on_back_to_menu_pressed() -> void:
 # ============================================================================
 
 func _on_home_goal_entered(body: Node2D) -> void:
-	# Check if it's the ball
 	if body == ball:
-		# Away team scored!
 		_register_goal(away_team, "away")
 
 func _on_away_goal_entered(body: Node2D) -> void:
-	# Check if it's the ball
 	if body == ball:
-		# Home team scored!
 		_register_goal(home_team, "home")
 
 func _register_goal(scoring_team: Team, team_side: String) -> void:
-	# Find who last touched the ball (scorer)
 	var scorer_idx = -1
 	var scoring_players = home_players if team_side == "home" else away_players
 	
-	# Find closest player to ball as scorer
 	if ball_possessor and is_instance_valid(ball_possessor):
-		# Use the player who has/had possession
 		scorer_idx = scoring_players.find(ball_possessor)
 	else:
-		# Fallback: find closest player
 		var closest_distance = INF
 		var closest_idx = -1
 		
@@ -551,8 +511,7 @@ func _register_goal(scoring_team: Team, team_side: String) -> void:
 		
 		scorer_idx = closest_idx
 	
-	# Record goal in match engine (it will emit goal_scored signal)
 	if match_engine and scorer_idx >= 0:
-		match_engine.record_goal(team_side, scorer_idx, 0.5)  # Default xG for now
+		match_engine.record_goal(team_side, scorer_idx, 0.5)
 	
 	print("GOAL! ", team_side, " team scores!")

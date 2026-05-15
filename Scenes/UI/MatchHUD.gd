@@ -49,6 +49,10 @@ var command_meter_value: float = 100.0
 # INITIALIZATION
 # ============================================================================
 func _ready() -> void:
+	# CRITICAL: Allow HUD to process input while the match engine is paused.
+	# Without this, pause/unpause and panel buttons stop working.
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	
 	_connect_signals()
 	_hide_all_panels()
 	update_display()
@@ -124,10 +128,10 @@ func update_time(minute: int, half: int) -> void:
 	_update_time()
 
 ## Update statistics (called from MatchScene every 5 seconds)
-func update_stats(stats: Dictionary) -> void:
+func update_stats(stats_data: Dictionary) -> void:
 	# Extract home and away stats
-	var home_stats = stats.get("home", {})
-	var away_stats = stats.get("away", {})
+	var home_stats = stats_data.get("home_stats", stats_data.get("home", {}))
+	var away_stats = stats_data.get("away_stats", stats_data.get("away", {}))
 	
 	# Calculate possession percentage
 	var home_poss = home_stats.get("possession_ticks", 0)
@@ -143,7 +147,6 @@ func update_stats(stats: Dictionary) -> void:
 	
 	# If stats panel exists, update visual display
 	if stats_panel:
-		# Update possession display
 		if possession_label:
 			possession_label.text = "Possession: %d%% - %d%%" % [int(home_poss_pct), int(away_poss_pct)]
 		
@@ -153,7 +156,6 @@ func update_stats(stats: Dictionary) -> void:
 		if possession_bar_away:
 			possession_bar_away.value = away_poss_pct
 		
-		# Update shots display
 		if shots_label:
 			var home_shots = home_stats.get("shots", 0)
 			var away_shots = away_stats.get("shots", 0)
@@ -161,7 +163,6 @@ func update_stats(stats: Dictionary) -> void:
 			var away_on_target = away_stats.get("shots_on_target", 0)
 			shots_label.text = "Shots: %d (%d) - %d (%d)" % [home_shots, home_on_target, away_shots, away_on_target]
 		
-		# Update passes display
 		if passes_label:
 			var home_completed = home_stats.get("passes_completed", 0)
 			var home_attempted = home_stats.get("passes_attempted", 0)
@@ -180,7 +181,6 @@ func update_stats(stats: Dictionary) -> void:
 				away_completed, away_attempted, away_pct
 			]
 		
-		# Update xG display
 		if xg_label:
 			var home_xg = home_stats.get("xg", 0.0)
 			var away_xg = away_stats.get("xg", 0.0)
@@ -193,7 +193,7 @@ func update_stats(stats: Dictionary) -> void:
 		var home_xg = home_stats.get("xg", 0.0)
 		var away_xg = away_stats.get("xg", 0.0)
 		
-		print("📊 Stats Update | Possession: %d%% - %d%% | Shots: %d - %d | xG: %.2f - %.2f" % [
+		print("Stats | Poss: %d%% - %d%% | Shots: %d - %d | xG: %.2f - %.2f" % [
 			int(home_poss_pct), int(away_poss_pct),
 			home_shots, away_shots,
 			home_xg, away_xg
@@ -241,12 +241,15 @@ func show_substitution_panel() -> void:
 	if substitution_panel:
 		substitution_panel.visible = true
 
-## Hide all panels
+## Hide all panels and resume the match engine
 func hide_all_panels() -> void:
 	_hide_all_panels()
-	# Unpause the game when closing panels
-	if get_tree():
-		get_tree().paused = false
+	# Resume the match engine when closing panels
+	var match_scene = get_parent()
+	if match_scene and "match_engine" in match_scene:
+		var engine = match_scene.match_engine
+		if engine and engine.is_paused:
+			engine.resume_match()
 
 # ============================================================================
 # BUTTON CALLBACKS

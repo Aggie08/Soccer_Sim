@@ -197,6 +197,11 @@ func remove_ball() -> void:
 	has_ball = false
 	_update_visuals()
 
+## Alias used by PlayerAI — releases ball and clears Ball node possession
+func release_ball() -> void:
+	has_ball = false
+	_update_visuals()
+
 # ============================================================================
 # SELECTION (For Tactical UI)
 # ============================================================================
